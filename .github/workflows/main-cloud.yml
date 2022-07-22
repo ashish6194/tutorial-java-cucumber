@@ -34,4 +34,4 @@ jobs:
         echo token=$(curl -H "Content-Type: application/json" -X POST --data @"cloud_auth.json" ${{ secrets.XRAYCLOUD_BASE_URL }}/api/v1/authenticate| tr -d '"') >> $GITHUB_ENV
     - name: "Import results to Xray (cloud) using multipart endpoint"
       run: |
-        curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer $token"  --data @"report.json" "$BASE_URL/api/v1/import/execution/cucumber"
+        curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer $token"  --data @"report.json" "${{ secrets.JIRASERVER_BASE_URL }}/api/v1/import/execution/cucumber"
