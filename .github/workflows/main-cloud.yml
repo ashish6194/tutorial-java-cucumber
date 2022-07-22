@@ -23,10 +23,8 @@ jobs:
       with:
         java-version: '${{ env.JDK_VERSION }}'
         distribution: 'adopt'
-    - name: Build with Maven
-      run: mvn clean compile -B package --file pom.xml
-
     - name: Run tests
+      continue-on-error: true
       run: mvn test -Dcucumber.plugin="json:report.json" -Dcucumber.features="src/test/resources/calculator/"
     - name: generate auxiliary JSON for authenticating with Xray cloud and obtain token
       run: |
