@@ -14,4 +14,4 @@ Feature:  As a user, I can add two numbers
     Given I have entered -1 into the calculator
     And I have entered 2 into the calculator
     When I press add
-    Then the result should be 1 on the screen
+    Then the result should be 2 on the screen
