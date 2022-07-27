@@ -1,5 +1,5 @@
 #@REQ_CALC-7931
-@REQ_CALC-3
+@REQ_SQA-3
 Feature:  As a user, I can add two numbers
 
   @TEST_SQA-4
