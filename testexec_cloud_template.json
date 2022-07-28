@@ -9,7 +9,6 @@
         }
     }, 
     "xrayFields": {
-        	"testPlanKey": "TESTPLAN_KEY",
-        	"environments": ["TEST_ENVIRONMENT_NAME"]
+        	"testPlanKey": "TESTPLAN_KEY"
     }
 }
