@@ -32,12 +32,17 @@ jobs:
       run: |
         FEATURES_FILE=features.zip
         rm -f $FEATURES_FILE
-        curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ env.token }}" "https://xray.cloud.getxray.app/api/v1/export/cucumber?keys=SQA-4,SQA-5" -o $FEATURES_FILE
+        curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ env.token }}" "https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=SQA-4,SQA-5" -o $FEATURES_FILE
         rm -f features/*.feature
         unzip -o $FEATURES_FILE  -d features
     - name: Run tests
       continue-on-error: true
       run: mvn test -Dcucumber.plugin="json:report.json" -Dcucumber.features="features/"
+
+    - name: generate auxiliary JSON to define some fields on the Test Execution to be created
+      run: |
+        cat testexec_cloud_template.json  | sed s/PROJECT_KEY/SQA/g | sed s/TEST_ENVIRONMENT_NAME/jdk${{ env.JDK_VERSION }}/g | sed s/TESTPLAN_KEY/SQA-12/g > test_exec.json
+
     - name: "Import results to Xray (cloud) using multipart endpoint"
       run: |
-        curl -H "Content-Type: application/json" -X POST -H "Authorization: Bearer ${{ env.token }}"  --data @"report.json" "https://xray.cloud.getxray.app/api/v1/import/execution/cucumber"
+        curl -X POST -H "Authorization: Bearer ${{ env.token }}"  -F info=@test_exec.json -F results=@"report.json" "${{ secrets.XRAYCLOUD_BASE_URL }}/api/v1/import/execution/cucumber/multipart"
