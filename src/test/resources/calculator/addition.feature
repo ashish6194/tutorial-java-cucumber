@@ -1,5 +1,4 @@
 #@REQ_CALC-7931
-@REQ_SQA-3
 Feature:  As a user, I can add two numbers
 
   Scenario: simple integer addition
