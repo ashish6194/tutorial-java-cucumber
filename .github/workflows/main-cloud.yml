@@ -28,16 +28,16 @@ jobs:
       run: |
         cat cloud_auth.json.sample  | sed s/CLIENT_ID/81B6E44125564643B12E9789E92C3D91/g | sed s/CLIENT_SECRET/c9415bcc7c8c65473239114db9d2a813e5f6a91389e158bf62d5fe2c52d46da9/g > cloud_auth.json
         echo token=$(curl -H "Content-Type: application/json" -X POST --data @"cloud_auth.json" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"') >> $GITHUB_ENV
-    - name: Export scenarios from Xray and generate .feature file(s)
+
+    - name: Import scenarios from Xray and generate .feature file(s)
       run: |
-        FEATURES_FILE=features.zip
-        rm -f $FEATURES_FILE
-        curl -H "Content-Type: application/json" -X GET -H "Authorization: Bearer ${{ env.token }}" "https://xray.cloud.getxray.app/api/v2/export/cucumber?keys=SQA-4,SQA-5,SQA-15" -o $FEATURES_FILE
-        rm -f features/*.feature
-        unzip -o $FEATURES_FILE  -d features
+        rm -f features.zip
+        zip -r features.zip src/test/resources/calculator/ -i \*.feature
+        curl -H "Content-Type: multipart/form-data" -H "Authorization: Bearer ${{ env.token }}" -F "file=@features.zip" "$BASE_URL/api/v2/import/feature?projectKey=SQA"
+
     - name: Run tests
       continue-on-error: true
-      run: mvn test -Dcucumber.plugin="json:report.json" -Dcucumber.features="features/"
+      run: mvn test -Dcucumber.plugin="json:report.json"
 
     - name: generate auxiliary JSON to define some fields on the Test Execution to be created
       run: |
