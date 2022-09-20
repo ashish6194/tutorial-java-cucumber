@@ -24,20 +24,20 @@ jobs:
         java-version: '${{ env.JDK_VERSION }}'
         distribution: 'adopt'
 
+    - name: Run tests
+      continue-on-error: true
+      run: mvn test -Dcucumber.plugin="json:report.json"
+
     - name: generate auxiliary JSON for authenticating with Xray cloud and obtain token
       run: |
         cat cloud_auth.json.sample  | sed s/CLIENT_ID/81B6E44125564643B12E9789E92C3D91/g | sed s/CLIENT_SECRET/c9415bcc7c8c65473239114db9d2a813e5f6a91389e158bf62d5fe2c52d46da9/g > cloud_auth.json
         echo token=$(curl -H "Content-Type: application/json" -X POST --data @"cloud_auth.json" https://xray.cloud.getxray.app/api/v1/authenticate| tr -d '"') >> $GITHUB_ENV
 
-    - name: Import scenarios from Xray and generate .feature file(s)
-      run: |
-        rm -f features.zip
-        zip -r features.zip src/test/resources/calculator/ -i \*.feature
-        curl -H "Content-Type: multipart/form-data" -H "Authorization: Bearer ${{ env.token }}" -F "file=@features.zip" "${{ secrets.XRAYCLOUD_BASE_URL }}/api/v2/import/feature?projectKey=SQA"
-
-    - name: Run tests
-      continue-on-error: true
-      run: mvn test -Dcucumber.plugin="json:report.json"
+#    - name: Import scenarios from Xray and generate .feature file(s)
+#      run: |
+#        rm -f features.zip
+#        zip -r features.zip src/test/resources/calculator/ -i \*.feature
+#        curl -H "Content-Type: multipart/form-data" -H "Authorization: Bearer ${{ env.token }}" -F "file=@features.zip" "${{ secrets.XRAYCLOUD_BASE_URL }}/api/v2/import/feature?projectKey=SQA"
 
     - name: generate auxiliary JSON to define some fields on the Test Execution to be created
       run: |
@@ -45,4 +45,6 @@ jobs:
 
     - name: "Import results to Xray (cloud) using multipart endpoint"
       run: |
-        curl -X POST -H "Authorization: Bearer ${{ env.token }}"  -F info=@test_exec.json -F results=@"report.json" "${{ secrets.XRAYCLOUD_BASE_URL }}/api/v1/import/execution/cucumber/multipart"
+        rm -f features.zip
+        zip -r features.zip src/test/resources/calculator/ -i \*.feature
+        curl -H "Content-Type: application/json" -H "Authorization: Bearer ${{ steps.xray-token.outputs.XRAY_TOKEN }}" -F "file=@features.zip"  -F info=@test_exec.json --data @cucumber.json  "https://xray.cloud.getxray.app/api/v2/import/execution/cucumber/multipart?projectKey=PKEYE"'
