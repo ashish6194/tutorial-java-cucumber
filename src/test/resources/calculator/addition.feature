@@ -16,7 +16,7 @@ Feature:  As a user, I can add two numbers
     When I press add
     Then the result should be 2 on the screen
 
-
+  @TEST_SQA-6
   Scenario: Tens integer addition
     Given I have entered 10 into the calculator
     And I have entered 19 into the calculator
