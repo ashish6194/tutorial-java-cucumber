@@ -33,7 +33,7 @@ jobs:
       run: |
         rm -f features.zip
         zip -r features.zip src/test/resources/calculator/ -i \*.feature
-        curl -H "Content-Type: multipart/form-data" -H "Authorization: Bearer ${{ env.token }}" -F "file=@features.zip" "$BASE_URL/api/v2/import/feature?projectKey=SQA"
+        curl -H "Content-Type: multipart/form-data" -H "Authorization: Bearer ${{ env.token }}" -F "file=@features.zip" "${{ secrets.XRAYCLOUD_BASE_URL }}/api/v2/import/feature?projectKey=SQA"
 
     - name: Run tests
       continue-on-error: true
